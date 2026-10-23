@@ -24,6 +24,10 @@ export default defineConfig({
     emptyOutDir: true,
     chunkSizeWarningLimit: 1_100,
     rolldownOptions: {
+      input: {
+        studio: path.join(root, 'index.html'),
+        playground: path.join(root, 'playground.html'),
+      },
       checks: { pluginTimings: false },
     },
   },

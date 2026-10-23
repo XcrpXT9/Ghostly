@@ -85,6 +85,29 @@ pnpm dev
 
 Open [http://localhost:5173](http://localhost:5173).
 
+### Website companion playground
+
+Open [http://localhost:5173/playground.html](http://localhost:5173/playground.html) after starting
+the dev server. The separate HTML playground is also included in the production build as
+`dist/playground.html`. Serve it over HTTP using `pnpm preview` or your static host.
+
+- Move the mouse to lead the mascot with a smooth trailing motion.
+- Click a button inside a bento card to dock at its closest top corner. Move more than 36 pixels
+  away from that card to resume following automatically.
+- Draw two full clockwise or counterclockwise circles within six seconds to trigger spiral eyes
+  and a temporary dizzy wobble. Avoid pausing for more than 800 ms between movements.
+- Double-click anywhere to jump, including while docked. The mascot lands back at its anchor.
+- Choose any bundled mascot or Vivi, the new irregular virus with a fluid membrane and moving
+  Y-shaped, forked, and round-tipped surface proteins. Adjust size and the optional fading trail.
+- Use the reaction buttons with touch or keyboard. Reduced-motion preferences preserve expressions
+  and docking while suppressing continuous membrane motion, wobble, jump displacement, and trails.
+
+The companion API is exported from `@bible-strong/avatar-web`; see its
+[integration guide](./packages/avatar-web/README.md#website-companions). Vivi is a procedural web
+renderer, not an editable Studio surface or `.avatar.json` export. The existing Studio document
+schema and saved avatars are unchanged. These additions are documented in the
+[companion specification](./docs/specs/2026-10-23-website-companion.md).
+
 ## Available commands
 
 | Command             | Purpose                                                                           |

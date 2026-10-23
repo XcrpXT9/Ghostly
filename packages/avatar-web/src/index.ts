@@ -302,3 +302,10 @@ export function createAvatar(
 }
 
 export type { AnimationKey, AvatarDefinition, AvatarRuntimeError, ExpressionKey }
+export {
+  createCompanion,
+  type CompanionOptions,
+  type CompanionController,
+  type CompanionState,
+} from './companion'
+export { createVirus, type VirusFrame } from './virus'

@@ -1,0 +1,194 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#f3f6fc" />
+    <meta
+      name="description"
+      content="A live playground for cursor-following mascots, magnetic docking, dizzy gestures, and a fluid virus avatar."
+    />
+    <title>Companion lab · Avatar playground</title>
+    <link rel="icon" href="./favicon.svg" />
+  </head>
+  <body>
+    <header class="site-header">
+      <a class="brand" href="./playground.html"
+        ><span class="brand-mark" aria-hidden="true">◉</span> Companion lab<span class="brand-tag"
+          >by Avatar Lab</span
+        ></a
+      >
+      <nav aria-label="Main navigation">
+        <a href="./index.html">Open avatar studio <span aria-hidden="true">↗</span></a
+        ><a href="https://github.com/smontlouis/bible-strong-avatar-lab">Source</a>
+      </nav>
+    </header>
+    <main>
+      <section class="intro">
+        <div>
+          <p class="intro-note"><span></span> A little character. A lot of personality.</p>
+          <h1>Give your cursor<br />some company.</h1>
+          <p class="lede">
+            Move around. Make a few circles. Find a place to land.<br class="desktop-break" />
+            Your new companion is curious about everything.
+          </p>
+        </div>
+        <div class="live-status">
+          <span class="live-dot"></span
+          ><span id="behavior" role="status" aria-live="polite">Following your cursor</span
+          ><span class="status-sub" id="character-name">Vivi is exploring</span>
+        </div>
+      </section>
+
+      <div class="workspace">
+        <section
+          class="specimen panel"
+          data-mascot-dock
+          id="specimen-card"
+          aria-labelledby="specimen-title"
+        >
+          <div class="panel-top">
+            <span class="pill">Meet your companion</span><span class="specimen-id">V / 01</span>
+          </div>
+          <div class="specimen-stage">
+            <div class="orbit orbit-one"></div>
+            <div class="orbit orbit-two"></div>
+            <div id="specimen-preview"></div>
+            <span class="annotation annotation-one">Fluid membrane<span></span></span
+            ><span class="annotation annotation-two"><span></span>Surface proteins</span>
+          </div>
+          <div class="specimen-bottom">
+            <div>
+              <h2 id="specimen-title">Vivi the virus</h2>
+              <p id="specimen-description">A soft little oddball with a life of its own.</p>
+            </div>
+            <button class="round-button" id="specimen-dock" aria-label="Dock to the specimen card">
+              ↗
+            </button>
+          </div>
+          <div class="specimen-details">
+            <span id="specimen-kind">Procedural organism</span
+            ><span>SVG, alive in your browser</span>
+          </div>
+        </section>
+
+        <section
+          class="dock-card panel"
+          data-mascot-dock
+          id="dock-card"
+          aria-labelledby="dock-title"
+        >
+          <div class="card-icon" aria-hidden="true">⌑</div>
+          <h2 id="dock-title">A place to perch.</h2>
+          <p>
+            Click below and I’ll settle on the closest top corner. Move away and I’m right behind
+            you.
+          </p>
+          <div class="dock-diagram" aria-hidden="true">
+            <span class="corner left"></span><span class="diagram-line"></span
+            ><span class="corner right"></span>
+            <div class="mini-grid"><i></i><i></i><i></i></div>
+          </div>
+          <button class="primary-button" id="dock-button">
+            Come sit here <span aria-hidden="true">↗</span>
+          </button>
+        </section>
+
+        <section class="controls panel" aria-labelledby="controls-title">
+          <div class="panel-top">
+            <h2 id="controls-title">Make yourself at home</h2>
+            <span aria-hidden="true">☷</span>
+          </div>
+          <div class="range-label">
+            <label for="size">Companion size</label
+            ><output for="size" id="size-output">108 px</output>
+          </div>
+          <input id="size" type="range" min="64" max="180" value="108" />
+          <div class="range-ends"><span>Tiny friend</span><span>Big personality</span></div>
+          <label class="toggle-row" for="trail"
+            ><span>Leave a little stardust<small>A fading trail behind your companion</small></span
+            ><input type="checkbox" role="switch" id="trail" checked /></label
+          ><button class="text-button" id="follow">
+            Bring back to cursor <span aria-hidden="true">↗</span>
+          </button>
+        </section>
+
+        <section class="circle-card panel" data-mascot-dock aria-labelledby="circle-title">
+          <div class="gesture-visual" aria-hidden="true">
+            <svg viewBox="0 0 120 100">
+              <path
+                d="M86 32C69 4 22 14 21 48S74 92 93 61C114 25 61 3 34 28S40 86 74 71"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-dasharray="5 6"
+              />
+              <path d="m72 63 3 10-11 1" fill="none" stroke="currentColor" stroke-width="2" /></svg
+            ><span>2×</span>
+          </div>
+          <div>
+            <h2 id="circle-title">You spin me right round.</h2>
+            <p>Draw two full circles with your mouse. Watch those eyes get a little dizzy.</p>
+            <button class="text-button" id="dizzy">
+              Try the dizzy expression <span aria-hidden="true">↗</span>
+            </button>
+          </div>
+        </section>
+
+        <section class="jump-card panel" data-mascot-dock aria-labelledby="jump-title">
+          <div class="jump-visual" aria-hidden="true">
+            <span class="jump-ball">!</span><span class="jump-shadow"></span><i></i><b>↑</b>
+          </div>
+          <div>
+            <h2 id="jump-title">A double-click of joy.</h2>
+            <p>Double-click anywhere to make your companion jump. Yes, even from its perch.</p>
+            <button class="text-button" id="jump">
+              Take a little leap <span aria-hidden="true">↗</span>
+            </button>
+          </div>
+        </section>
+      </div>
+
+      <section class="character-section" aria-labelledby="characters-title">
+        <div class="section-heading">
+          <div>
+            <h2 id="characters-title">Different faces. Same playful spirit.</h2>
+            <p>Take an original Avatar Lab mascot for a spin, or stick with our newest organism.</p>
+          </div>
+          <span id="character-count" class="pill"></span>
+        </div>
+        <div
+          class="character-shelf"
+          id="character-shelf"
+          role="group"
+          aria-label="Choose a companion"
+        ></div>
+      </section>
+
+      <section class="field-notes">
+        <div>
+          <span aria-hidden="true">✳</span>
+          <h2>Made for the open web.</h2>
+          <p>
+            These are live SVG characters. Try the same gestures with any mascot, or open the studio
+            to build your own.
+          </p>
+        </div>
+        <div class="keyboard-note">
+          <span>Touch screen?</span>
+          <p>
+            Use the buttons to try each reaction.<br />Motion follows your system accessibility
+            preference.
+          </p>
+        </div>
+      </section>
+    </main>
+    <footer>
+      <span>Built on Bible Strong Avatar Lab</span
+      ><a href="https://github.com/smontlouis/bible-strong-avatar-lab">Open source · AGPL-3.0</a
+      ><span>Small friend, big web.</span>
+    </footer>
+    <script type="module" src="/src/playground/main.ts"></script>
+  </body>
+</html>
