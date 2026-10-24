@@ -137,8 +137,21 @@ import {
 export function useStudioController() {
   const { language, setLanguage, t } = useStudioLanguage()
   const [mode, setMode] = useState<Mode>('avatars')
-  const [initialDocument] = useState(loadStudioDocument)
+  const [initialDocument] = useState(() => {
+    const document = loadStudioDocument()
+    const requested = new URLSearchParams(window.location.search).get('avatar')
+    if (requested && document.library.avatars.some(avatar => avatar.id === requested))
+      document.library.activeAvatarId = requested
+    return document
+  })
   const [documentStore] = useState(() => createStudioDocumentStore(initialDocument))
+  useEffect(() => {
+    const url = new URL(window.location.href)
+    if (url.searchParams.has('avatar')) {
+      url.searchParams.delete('avatar')
+      window.history.replaceState(window.history.state, '', url)
+    }
+  }, [])
   const initialLibrary = initialDocument.library
   const [avatars, setAvatars] = useState(initialLibrary.avatars)
   const [activeAvatarId, setActiveAvatarId] = useState(initialLibrary.activeAvatarId)
@@ -418,6 +431,7 @@ export function useStudioController() {
       includeWire: showWireRef.current || highlightRef.current === 'head',
       bodyNodes: bodyNodesRef.current,
       eyeOffset,
+      timeMs: reduceMotion ? 0 : (frameTimeMs ?? performance.now()),
     })
     paintRenderedScene(renderedScene, geometry)
     paintRenderedOffset(
@@ -441,7 +455,8 @@ export function useStudioController() {
     }
   })
 
-  const ambientLoopActive = !reduceMotion && hasAmbientMotion(editing?.draft ?? expression)
+  const ambientLoopActive =
+    !reduceMotion && (surface.type === 'virus' || hasAmbientMotion(editing?.draft ?? expression))
   useEffect(() => {
     if (!ambientLoopActive) return
     const tick = (time: number) => {
@@ -1662,6 +1677,7 @@ export function useStudioController() {
   }
   const currentStudioDocument = (): StudioDocument => ({
     version: 2,
+    bundledAvatarVersion: 1,
     library: { activeAvatarId, avatars },
     expressions: baseBehavior.expressions,
     sequences: baseBehavior.sequences,

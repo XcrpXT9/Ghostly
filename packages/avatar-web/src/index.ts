@@ -197,11 +197,24 @@ export function createAvatar(
       if (completedAnimation !== currentAnimation) onAnimationEnd?.(currentAnimation)
       completedAnimation = currentAnimation
     }
-    if (playback.status === 'playing') frameRequest = requestAnimationFrame(tick)
+    if (
+      playback.status === 'playing' ||
+      (definition.body.primary.type === 'virus' &&
+        playback.status !== 'paused' &&
+        !runtimeEnvironment().reduceMotion)
+    )
+      frameRequest = requestAnimationFrame(tick)
   }
   const schedule = () => {
     if (frameRequest === null && !destroyed) frameRequest = requestAnimationFrame(tick)
   }
+
+  const motionQuery = window.matchMedia?.('(prefers-reduced-motion: reduce)')
+  const refreshMotion = () => {
+    renderCurrent(performance.now())
+    if (definition.body.primary.type === 'virus' && playback.status !== 'paused') schedule()
+  }
+  motionQuery?.addEventListener?.('change', refreshMotion)
 
   const controller: AvatarController = {
     play(animation) {
@@ -247,12 +260,21 @@ export function createAvatar(
             }),
       }
       renderCurrent(performance.now())
-      if (playback.status === 'playing') schedule()
+      if (
+        playback.status === 'playing' ||
+        (definition.body.primary.type === 'virus' && !runtimeEnvironment().reduceMotion)
+      )
+        schedule()
       return { ok: true }
     },
     pause() {
-      if (playback.status !== 'playing') return
-      playback = pauseAvatarPlayback(playback, performance.now())
+      if (playback.status === 'paused') return
+      if (playback.status !== 'playing' && definition.body.primary.type !== 'virus') return
+      playback = {
+        ...pauseAvatarPlayback(playback, performance.now()),
+        status: 'paused',
+        pausedAt: performance.now(),
+      }
       if (frameRequest !== null) cancelAnimationFrame(frameRequest)
       frameRequest = null
     },
@@ -262,12 +284,14 @@ export function createAvatar(
       frameRequest = null
       paint(renderAvatarDefinition(definition))
       notifyExpression()
+      if (definition.body.primary.type === 'virus' && !runtimeEnvironment().reduceMotion) schedule()
     },
     getState() {
       return playbackSnapshot(playback)
     },
     destroy() {
       destroyed = true
+      motionQuery?.removeEventListener?.('change', refreshMotion)
       if (frameRequest !== null) cancelAnimationFrame(frameRequest)
       frameRequest = null
       host.remove()
@@ -298,6 +322,7 @@ export function createAvatar(
     notifyExpression()
   }
 
+  if (definition.body.primary.type === 'virus' && !runtimeEnvironment().reduceMotion) schedule()
   return controller
 }
 

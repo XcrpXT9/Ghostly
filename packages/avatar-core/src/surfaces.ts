@@ -1,7 +1,7 @@
 import type { Point3 } from './geometry'
 
 export type SurfaceType =
-  'sphere' | 'mickey' | 'cursor' | 'cube' | 'capsule' | 'cylinder' | 'cone' | 'diamond'
+  'sphere' | 'virus' | 'mickey' | 'cursor' | 'cube' | 'capsule' | 'cylinder' | 'cone' | 'diamond'
 
 export type SurfaceConfig = {
   type: SurfaceType
@@ -20,6 +20,7 @@ export type SurfaceSample = {
 }
 
 export const surfacePresets: Record<SurfaceType, SurfaceConfig> = {
+  virus: { type: 'virus', width: 180, height: 180, depth: 180, roundness: 1 },
   sphere: { type: 'sphere', width: 240, height: 240, depth: 240, roundness: 1 },
   mickey: { type: 'mickey', width: 220, height: 210, depth: 145, roundness: 1 },
   cursor: { type: 'cursor', width: 175, height: 260, depth: 145, roundness: 0 },
@@ -47,6 +48,7 @@ export const surfacePresets: Record<SurfaceType, SurfaceConfig> = {
 }
 
 export const surfaceLabels: Record<SurfaceType, string> = {
+  virus: 'Virus',
   sphere: 'Sphère',
   mickey: 'Mickey',
   cursor: 'Curseur',
@@ -304,6 +306,7 @@ export const surfacePointAt = (
   const { width, height, depth } = config
   switch (config.type) {
     case 'sphere':
+    case 'virus':
     case 'mickey':
       return superellipsoid(longitude, latitude, width, height, depth, 1, 1)
     case 'cube':
@@ -528,6 +531,7 @@ export const surfaceFrontSampleAt = (
 
   switch (config.type) {
     case 'sphere':
+    case 'virus':
     case 'mickey':
       return ellipsoidFrontSample(x, y, radiusX, radiusY, radiusZ)
 

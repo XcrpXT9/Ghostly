@@ -54,12 +54,14 @@ export const renderAvatarExpression = (
   definition: Readonly<AvatarDefinition>,
   expression: Expression,
   colors: { body?: string; eyes?: string } = {},
-  blink = 1
+  blink = 1,
+  timeMs = 0
 ): AvatarScene => {
   const body = bodyFromDefinition(definition.body)
   return {
     geometry: renderAvatar(poseFromExpression(expression), body.primary, blink, {
       bodyNodes: body.nodes,
+      timeMs,
     }),
     colors: {
       body: colors.body ?? expression.bodyColor ?? definition.colors.body,

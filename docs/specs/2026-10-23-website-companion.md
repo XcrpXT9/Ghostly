@@ -27,11 +27,11 @@ and a selectable shelf of the repository's bundled characters.
 
 The new virus is an SVG renderer with a periodically sampled irregular membrane. Y-shaped, forked,
 and round-tipped proteins share its moving boundary. Expressions include tracking eyes, spiral eyes,
-and a surprised jumping face. It is a companion renderer, not a new Studio document surface type.
+and a surprised jumping face. It is a native Studio `virus` surface, rendered by shared core geometry across Studio, React, web, and companion integrations.
 
 Deliver a separate Vite HTML entry at `/playground.html`, included in production builds, with size
 and trail controls, keyboard-accessible action buttons, current behavior feedback, and instructions.
-Document reuse on arbitrary websites and the virus's runtime-only scope.
+The playground reads the saved Studio document and selected avatar. The Studio exposes companion controls and a link to test the selected avatar. Existing projects receive Vivi once, preserving their selection and custom work; a persisted catalog marker prevents resurrection after deletion.
 
 ## Verification
 

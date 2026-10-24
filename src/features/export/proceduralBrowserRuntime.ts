@@ -193,6 +193,7 @@ function mountAvatar(target, options = {}) {
       includeWire: false,
       bodyNodes: DATA.avatar.bodyNodes,
       eyeOffset,
+      timeMs: window.matchMedia?.('(prefers-reduced-motion: reduce)').matches ? 0 : time,
     });
     const offset = AvatarProceduralEngine.ambientBodyOffset(currentPose.expression, bodyElapsed, ambientStrength);
     if (pixelStyle && pixelContext) {
@@ -251,7 +252,7 @@ function mountAvatar(target, options = {}) {
         blinkState = null;
       }
     }
-    const ambientActive = AvatarProceduralEngine.hasAmbientMotion(currentPose.expression);
+    const ambientActive = DATA.avatar.surface.type === 'virus' || AvatarProceduralEngine.hasAmbientMotion(currentPose.expression);
     if (transitionState || blinkState || !ambientActive || time - lastAmbientFrame >= 1000 / 30) {
       render(time);
       if (ambientActive) lastAmbientFrame = time;
@@ -274,7 +275,7 @@ function mountAvatar(target, options = {}) {
       currentPose = targetPose;
       currentColors = targetColors;
       render();
-      if (AvatarProceduralEngine.hasAmbientMotion(currentPose.expression)) requestTick();
+      if (DATA.avatar.surface.type === 'virus' || AvatarProceduralEngine.hasAmbientMotion(currentPose.expression)) requestTick();
       return;
     }
     transitionState = {
@@ -420,7 +421,7 @@ function mountAvatar(target, options = {}) {
   };
   applyMotion(initialExpression);
   render();
-  if (AvatarProceduralEngine.hasAmbientMotion(initialExpression)) requestTick();
+  if (DATA.avatar.surface.type === 'virus' || AvatarProceduralEngine.hasAmbientMotion(initialExpression)) requestTick();
   if (options.autoplay !== false) api.play(currentAnimation);
   return api;
 }

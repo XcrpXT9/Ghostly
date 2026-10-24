@@ -323,7 +323,7 @@ export function ExportSection({
 }
 
 export function InspectorCard({ className, ...props }: React.ComponentProps<typeof Card>) {
-  return <Card className={`panel${className ? ` ${className}` : ''}`} {...props} />
+  return <Card data-mascot-dock className={`panel${className ? ` ${className}` : ''}`} {...props} />
 }
 
 export function StatePlayer({

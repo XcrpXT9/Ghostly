@@ -2,8 +2,27 @@
 
 import definitionJson from '../../../../examples/react-vite-consumer/src/strobi.avatar.json'
 import { createAvatar } from '../index'
+import { createVirusDefinition } from '@bible-strong/avatar-core'
 
 describe('@bible-strong/avatar-web', () => {
+  it('animates the native virus at rest and freezes it when paused', () => {
+    let tick: FrameRequestCallback = () => {}
+    vi.stubGlobal('requestAnimationFrame', (callback: FrameRequestCallback) => {
+      tick = callback
+      return 1
+    })
+    const avatar = createAvatar('#avatar', { definition: createVirusDefinition() })
+    const head = document.querySelector('#avatar clipPath path')!
+    const first = head.getAttribute('d')
+    tick(1000)
+    expect(head.getAttribute('d')).not.toBe(first)
+    avatar.pause()
+    expect(avatar.getState().status).toBe('paused')
+    expect(cancelAnimationFrame).toHaveBeenCalled()
+    avatar.setExpression('neutral')
+    expect(avatar.getState().status).toBe('stopped')
+    avatar.destroy()
+  })
   beforeEach(() => {
     document.body.innerHTML = '<div id="avatar"></div>'
     vi.stubGlobal('requestAnimationFrame', () => 1)

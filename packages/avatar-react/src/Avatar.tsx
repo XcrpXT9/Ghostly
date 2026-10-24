@@ -50,8 +50,8 @@ const shouldRunFrameLoop = (
   return (
     playback.status === 'stopped' &&
     !environment.reduceMotion &&
-    motion !== undefined &&
-    (motion.eyes !== 'none' || motion.body !== 'none')
+    (definition.body.primary.type === 'virus' ||
+      (motion !== undefined && (motion.eyes !== 'none' || motion.body !== 'none')))
   )
 }
 
@@ -208,6 +208,14 @@ export function Avatar({
   const [playback, setPlayback] = useState<CorePlaybackState>(() =>
     createInitialPlayback(definition, animation, expression, defaultAnimation, defaultExpression)
   )
+  const [motionPreference, setMotionPreference] = useState(false)
+  useEffect(() => {
+    const query = window.matchMedia('(prefers-reduced-motion: reduce)')
+    const update = () => setMotionPreference(query.matches)
+    update()
+    query.addEventListener?.('change', update)
+    return () => query.removeEventListener?.('change', update)
+  }, [])
 
   const paintScene = (frameScene: ReturnType<typeof renderAvatarFrame>) => {
     headPathRef.current?.setAttribute('d', frameScene.geometry.headPath)
@@ -372,7 +380,7 @@ export function Avatar({
     }
     frame = requestAnimationFrame(tick)
     return () => cancelAnimationFrame(frame)
-  }, [definition, playback.activeExpression, playback.status, onAnimationEnd])
+  }, [definition, playback.activeExpression, playback.status, onAnimationEnd, motionPreference])
 
   const controlled = animation !== undefined || expression !== undefined
   useImperativeHandle(ref, () => ({
@@ -447,8 +455,13 @@ export function Avatar({
     },
     pause() {
       const current = playbackRef.current
-      if (!current || current.status !== 'playing') return
-      const next = pauseAvatarPlayback(current, performance.now())
+      if (!current || current.status === 'paused') return
+      if (current.status !== 'playing' && definition.body.primary.type !== 'virus') return
+      const next: CorePlaybackState = {
+        ...pauseAvatarPlayback(current, performance.now()),
+        status: 'paused',
+        pausedAt: performance.now(),
+      }
       playbackRef.current = next
       setPlayback(next)
     },

@@ -43,7 +43,7 @@ export function AvatarPage({ controller }: { controller: StudioController }) {
 
   return (
     <div className="panel-stack avatar-page">
-      <section className="avatar-shelf" aria-label={t('Choisir un avatar')}>
+      <section className="avatar-shelf" data-mascot-dock aria-label={t('Choisir un avatar')}>
         <div className="avatar-shelf-heading">
           <strong>{t('Double-clic pour modifier')}</strong>
           <span>{avatars.length}</span>

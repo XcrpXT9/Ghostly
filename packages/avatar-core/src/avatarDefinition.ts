@@ -43,7 +43,7 @@ export type SurfaceDefinition<TType extends SurfaceType = SurfaceType> = {
   baseRoundness?: number
 }
 
-export type BodyNodeSurfaceType = Exclude<SurfaceType, 'mickey' | 'cursor'>
+export type BodyNodeSurfaceType = Exclude<SurfaceType, 'mickey' | 'cursor' | 'virus'>
 export type PrimarySurfaceDefinition = SurfaceDefinition<SurfaceType>
 export type BodyNodeSurfaceDefinition = SurfaceDefinition<BodyNodeSurfaceType>
 

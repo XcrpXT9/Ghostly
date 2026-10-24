@@ -2,7 +2,6 @@ import './styles.css'
 import {
   createAvatar,
   createCompanion,
-  createVirus,
   type CompanionState,
 } from '../../packages/avatar-web/src/index'
 import { createAvatarDefinition } from '../features/avatar/avatarDefinition'
@@ -10,20 +9,28 @@ import { resolveAvatarBehavior } from '../features/avatar/avatars'
 import { loadStudioDocument } from '../features/studio/studioDocument'
 
 const find = <T extends HTMLElement>(id: string) => document.getElementById(id) as T
-const studio = loadStudioDocument({ getItem: () => null })
+const studio = loadStudioDocument()
 const choices = studio.library.avatars.map(avatar => {
-  const definition = createAvatarDefinition({
+  const candidate = createAvatarDefinition({
     avatar,
     behavior: resolveAvatarBehavior(avatar, studio),
   })
+  const definition = candidate.ok
+    ? candidate
+    : createAvatarDefinition({ avatar, behavior: { expressions: [], sequences: [] } })
   if (!definition.ok)
     throw new Error(
       `Could not load ${avatar.name}: ${definition.errors.map(error => error.message).join(', ')}`
     )
-  return { name: avatar.name, definition: definition.value }
+  return { id: avatar.id, name: avatar.name, definition: definition.value }
 })
-const characters = [{ name: 'Vivi', definition: undefined }, ...choices]
-let selected = 0
+const characters = choices
+const requested =
+  new URLSearchParams(window.location.search).get('avatar') ?? studio.library.activeAvatarId
+let selected = Math.max(
+  0,
+  characters.findIndex(character => character.id === requested)
+)
 let currentState: CompanionState = { mode: 'following', side: null, dizzy: false, jumping: false }
 const companion = createCompanion({
   initialPosition: { x: window.innerWidth - 150, y: 180 },
@@ -42,7 +49,6 @@ const companion = createCompanion({
 })
 const thumbnails: { destroy(): void }[] = []
 let preview: { destroy(): void } | null = null
-let virusPreview: ReturnType<typeof createVirus> | null = null
 const shelf = find('character-shelf')
 function select(index: number) {
   selected = index
@@ -50,22 +56,23 @@ function select(index: number) {
   companion.setAvatar(character.definition)
   preview?.destroy()
   find('specimen-preview').replaceChildren()
-  virusPreview = index === 0 ? createVirus(find('specimen-preview')) : null
-  preview =
-    virusPreview ??
-    createAvatar(find('specimen-preview'), { definition: character.definition, size: '100%' })
-  find('specimen-title').textContent = index === 0 ? 'Vivi the virus' : character.name
-  find('specimen-description').textContent =
-    index === 0
-      ? 'A soft little oddball with a life of its own.'
-      : 'An original character, ready for a new adventure.'
-  find('specimen-kind').textContent =
-    index === 0 ? 'Procedural organism' : 'Original Avatar Lab mascot'
+  preview = createAvatar(find('specimen-preview'), {
+    definition: character.definition,
+    size: '100%',
+  })
+  const isVirus = character.definition.body.primary.type === 'virus'
+  document.querySelector<HTMLAnchorElement>('nav a')!.href =
+    `./index.html?avatar=${encodeURIComponent(character.id)}`
+  find('specimen-title').textContent = character.name
+  find('specimen-description').textContent = isVirus
+    ? 'A soft little oddball with a life of its own.'
+    : 'An original character, ready for a new adventure.'
+  find('specimen-kind').textContent = isVirus ? 'Native virus avatar' : 'Studio avatar'
   find('character-name').textContent =
     `${character.name} is ${currentState.mode === 'docked' ? 'perched nearby' : 'exploring'}`
   document.querySelectorAll<HTMLElement>('.annotation').forEach(node => {
-    node.hidden = index !== 0
-    node.style.display = index === 0 ? '' : 'none'
+    node.hidden = !isVirus
+    node.style.display = isVirus ? '' : 'none'
   })
   shelf
     .querySelectorAll('button')
@@ -74,7 +81,7 @@ function select(index: number) {
 characters.forEach((character, index) => {
   const button = document.createElement('button')
   button.className = 'character'
-  button.setAttribute('aria-pressed', String(index === 0))
+  button.setAttribute('aria-pressed', String(index === selected))
   button.setAttribute('aria-label', `Choose ${character.name}`)
   const picture = document.createElement('span')
   picture.className = 'character-preview'
@@ -82,22 +89,18 @@ characters.forEach((character, index) => {
   const name = document.createElement('span')
   name.textContent = character.name
   button.append(picture, name)
-  if (index === 0) {
+  if (character.id === 'vivi') {
     const tag = document.createElement('span')
     tag.className = 'new-tag'
     tag.textContent = 'New'
     button.append(tag)
   }
-  thumbnails.push(
-    character.definition
-      ? createAvatar(picture, { definition: character.definition, size: '100%' })
-      : createVirus(picture)
-  )
+  thumbnails.push(createAvatar(picture, { definition: character.definition, size: '100%' }))
   button.addEventListener('click', () => select(index))
   shelf.append(button)
 })
 find('character-count').textContent = `${characters.length} companions`
-select(0)
+select(selected)
 find('size').addEventListener('input', event => {
   const value = Number((event.target as HTMLInputElement).value)
   companion.setSize(value)
@@ -109,16 +112,22 @@ find('trail').addEventListener('change', event =>
 find('follow').addEventListener('click', () => companion.follow())
 find('dizzy').addEventListener('click', () => companion.dizzy())
 find('jump').addEventListener('click', () => companion.jump())
-const media = window.matchMedia('(prefers-reduced-motion: reduce)')
-let frame = 0
-function animate(time: number) {
-  virusPreview?.render({ ...currentState, time, gaze: { x: 0, y: 0 }, reduceMotion: media.matches })
-  frame = requestAnimationFrame(animate)
+// Refresh shared Studio data when returning from the editor in another tab.
+let savedProject: string | null = null
+try {
+  savedProject = localStorage.getItem('bible-strong-avatar-studio-v2')
+} catch {
+  /* Storage may be unavailable. */
 }
-frame = requestAnimationFrame(animate)
+window.addEventListener('focus', () => {
+  try {
+    if (localStorage.getItem('bible-strong-avatar-studio-v2') !== savedProject) location.reload()
+  } catch {
+    /* The in-memory library remains usable. */
+  }
+})
 window.addEventListener('pagehide', event => {
   if (event.persisted) return
-  cancelAnimationFrame(frame)
   companion.destroy()
   preview?.destroy()
   thumbnails.forEach(item => item.destroy())

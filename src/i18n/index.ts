@@ -26,6 +26,20 @@ const readStoredStudioLanguage = (): StudioLanguage => {
 }
 
 const english: Record<string, string> = {
+  Virus: 'Virus',
+  'Compagnon du site': 'Website companion',
+  'Afficher le compagnon': 'Show companion',
+  'Deux cercles pour étourdir, un double-clic pour sauter. Éloignez le curseur pour détacher.':
+    'Circle twice to get dizzy; double-click to jump. Move away to undock.',
+  Suivre: 'Follow',
+  Sauter: 'Jump',
+  Étourdir: 'Get dizzy',
+  Étourdi: 'Dizzy',
+  'En saut': 'Jumping',
+  Accroché: 'Docked',
+  'Suit le curseur': 'Following cursor',
+  Masqué: 'Hidden',
+  Playground: 'Playground',
   'Playground de l’avatar': 'Avatar playground',
   Arrêté: 'Stopped',
   'Aperçu procédural en direct': 'Live procedural preview',

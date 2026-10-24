@@ -680,6 +680,37 @@
           "leftAngle": 6.980078125,
           "rightAngle": -7.012890625000001
         }
+      },
+      {
+        "id": "vivi",
+        "name": "Vivi",
+        "body": {
+          "primary": {
+            "type": "virus",
+            "width": 180,
+            "height": 180,
+            "depth": 180,
+            "roundness": 1
+          },
+          "nodes": []
+        },
+        "colors": {
+          "body": "#aa83df",
+          "eyes": "#302347"
+        },
+        "eyes": {
+          "widthLeft": 18,
+          "widthRight": 18,
+          "heightLeft": 34,
+          "heightRight": 34,
+          "spacing": 32,
+          "positionXLeft": 0,
+          "positionXRight": 0,
+          "positionYLeft": -7,
+          "positionYRight": -7,
+          "leftAngle": 0,
+          "rightAngle": 0
+        }
       }
     ]
   },
@@ -2192,5 +2223,6 @@
   "playback": {
     "stateId": "proud",
     "playing": true
-  }
+  },
+  "bundledAvatarVersion": 1
 }

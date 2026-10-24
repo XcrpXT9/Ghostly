@@ -1,5 +1,6 @@
 import {
   CircleGesture,
+  createVirusDefinition,
   distanceFromRect,
   jumpOffset,
   nearestDock,
@@ -7,7 +8,6 @@ import {
   type Point,
 } from '@bible-strong/avatar-core'
 import { createAvatar, type AvatarController } from './index'
-import { createVirus } from './virus'
 
 export type CompanionState = {
   mode: 'following' | 'docked'
@@ -78,7 +78,6 @@ export function createCompanion(options: CompanionOptions = {}): CompanionContro
     return { element: dot, position: { ...position } }
   })
   host.append(mover)
-  let virus: ReturnType<typeof createVirus> | null = null
   let avatar: AvatarController | null = null
   let currentDefinition: AvatarDefinition | undefined
   let renderedMood = ''
@@ -131,14 +130,12 @@ export function createCompanion(options: CompanionOptions = {}): CompanionContro
     // Construct off-screen first, so invalid input leaves the working mascot intact.
     const next = document.createElement('div')
     next.style.cssText = 'width:100%;height:100%'
-    const nextAvatar = definition ? createAvatar(next, { definition, size: '100%' }) : null
-    const nextVirus = definition ? null : createVirus(next)
+    const nativeDefinition = definition ?? createVirusDefinition()
+    const nextAvatar = createAvatar(next, { definition: nativeDefinition, size: '100%' })
     avatar?.destroy()
-    virus?.destroy()
     body.replaceChildren(next)
     avatar = nextAvatar
-    virus = nextVirus
-    currentDefinition = definition
+    currentDefinition = nativeDefinition
     renderedMood = ''
   }
   const move = (event: PointerEvent) => {
@@ -153,6 +150,7 @@ export function createCompanion(options: CompanionOptions = {}): CompanionContro
   }
   const click = (event: MouseEvent) => {
     if (!(event.target instanceof Element)) return
+    if (event.target.closest('[data-mascot-ignore]')) return
     const button = event.target.closest('button, [role="button"], a')
     const target = button?.closest<HTMLElement>(selector)
     if (target && !button?.hasAttribute('disabled')) dock(target)
@@ -194,11 +192,6 @@ export function createCompanion(options: CompanionOptions = {}): CompanionContro
     mover.style.transform = `translate3d(${position.x - half}px,${position.y - half + jumpY}px,0)`
     body.style.transform = `rotate(${wobble}deg) scale(${snapshot.jumping && !reduceMotion ? 0.96 : 1},${snapshot.jumping && !reduceMotion ? 1.04 : 1})`
     stars.style.display = snapshot.dizzy ? 'block' : 'none'
-    const gaze = {
-      x: Math.tanh((pointer.x - position.x) / 80),
-      y: Math.tanh((pointer.y - position.y) / 80),
-    }
-    virus?.render({ ...snapshot, time: now, gaze, reduceMotion })
     if (avatar && currentDefinition) {
       const mood = snapshot.dizzy ? 'dizzy' : snapshot.jumping ? 'surprised' : 'neutral'
       if (mood !== renderedMood) {
@@ -280,7 +273,6 @@ export function createCompanion(options: CompanionOptions = {}): CompanionContro
       window.removeEventListener('blur', resetGesture)
       media?.removeEventListener('change', changeMotion)
       avatar?.destroy()
-      virus?.destroy()
       host.remove()
     },
   }

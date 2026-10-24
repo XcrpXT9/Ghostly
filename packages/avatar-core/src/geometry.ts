@@ -6,6 +6,7 @@ import {
   type SurfaceConfig,
 } from './surfaces'
 import type { BodyNode } from './body'
+import { membranePoint } from './companion'
 
 export type Quaternion = readonly [number, number, number, number]
 export type Point3 = readonly [number, number, number]
@@ -60,6 +61,7 @@ export type AvatarGeometry = {
 }
 
 export type RenderAvatarOptions = {
+  timeMs?: number
   includeWire?: boolean
   bodyNodes?: BodyNode[]
   eyeOffset?: Readonly<{ x: number; y: number }>
@@ -1043,6 +1045,81 @@ const projectedEllipsoidPath = (pose: AvatarPose, surface: SurfaceConfig) => {
   return ellipse ? ellipsePath(ellipse) : null
 }
 
+// The membrane follows the projected ellipsoid, so dimensions, depth and rotation
+// remain editable through the same controls as every other Studio surface.
+const virusGeometry = (pose: AvatarPose, surface: SurfaceConfig, time: number) => {
+  const ellipse = projectedEllipsoid(pose, [
+    surface.width / 2,
+    surface.height / 2,
+    surface.depth / 2,
+  ]) ?? {
+    centerX: 0,
+    centerY: 0,
+    majorRadius: surface.width / 2,
+    minorRadius: surface.height / 2,
+    rotation: 0,
+  }
+  if (surface.width === surface.height && surface.height === surface.depth) {
+    ellipse.majorRadius = ellipse.minorRadius = (ellipse.majorRadius + ellipse.minorRadius) / 2
+    ellipse.rotation = radians(pose.expression.headZ)
+  }
+  const boundary = (angle: number): Point3 => {
+    const p = membranePoint(angle, time)
+    const x = (p.x / 66) * ellipse.majorRadius
+    const y = (p.y / (66 * 0.93)) * ellipse.minorRadius
+    return [
+      ellipse.centerX + x * Math.cos(ellipse.rotation) - y * Math.sin(ellipse.rotation),
+      ellipse.centerY + x * Math.sin(ellipse.rotation) + y * Math.cos(ellipse.rotation),
+      0,
+    ]
+  }
+  const scale = Math.min(ellipse.majorRadius, ellipse.minorRadius) / 66
+  const disc = (x: number, y: number, radius: number) =>
+    `M${x - radius} ${y}a${radius} ${radius} 0 1 0 ${radius * 2} 0a${radius} ${radius} 0 1 0 ${-radius * 2} 0Z`
+  const rod = (a: Point3, b: Point3) => {
+    const length = Math.hypot(b[0] - a[0], b[1] - a[1]) || 1
+    const radius = 2.4 * scale
+    const dx = (-(b[1] - a[1]) / length) * radius
+    const dy = ((b[0] - a[0]) / length) * radius
+    return (
+      path([
+        [a[0] + dx, a[1] + dy, 0],
+        [b[0] + dx, b[1] + dy, 0],
+        [b[0] - dx, b[1] - dy, 0],
+        [a[0] - dx, a[1] - dy, 0],
+      ]) +
+      disc(a[0], a[1], radius) +
+      disc(b[0], b[1], radius)
+    )
+  }
+  const proteins = Array.from({ length: 17 }, (_, index) => {
+    const angle = (index / 17) * Math.PI * 2
+    const base = boundary(angle)
+    const direction = angle + ellipse.rotation + Math.sin(time / 650 + index * 2) * 0.12
+    const point = (out: number, lateral = 0): Point3 => [
+      base[0] + (Math.cos(direction) * out - Math.sin(direction) * lateral) * scale,
+      base[1] + (Math.sin(direction) * out + Math.cos(direction) * lateral) * scale,
+      0,
+    ]
+    const tip = point(16)
+    const stem = rod(point(-3), tip)
+    return (
+      stem +
+      (index % 3 === 0
+        ? rod(tip, point(23, -7)) + rod(tip, point(23, 7))
+        : index % 3 === 1
+          ? rod(point(17, -6), point(17, 6))
+          : disc(tip[0], tip[1], 5 * scale))
+    )
+  }).join('')
+  return {
+    membrane: smoothHullPath(
+      Array.from({ length: 96 }, (_, index) => boundary((index / 96) * Math.PI * 2))
+    ),
+    proteins,
+  }
+}
+
 const mickeyEarPaths = (pose: AvatarPose, surface: SurfaceConfig) => {
   if (surface.type !== 'mickey') return []
 
@@ -1245,13 +1322,14 @@ export const renderAvatar = (
   const left = leftSamples.map(sample => sample.point)
   const right = rightSamples.map(sample => sample.point)
   const accessories = accessoryLayers(pose, options.bodyNodes ?? [])
-  const compositePaths = compositeBackPaths(pose, surface)
+  const virus = surface.type === 'virus' ? virusGeometry(pose, surface, options.timeMs ?? 0) : null
+  const compositePaths = virus ? [virus.proteins] : compositeBackPaths(pose, surface)
   return {
     backPaths: [...compositePaths, ...accessories.backPaths],
     frontPaths: accessories.frontPaths,
     backNodeIds: [...compositePaths.map(() => null), ...accessories.backNodeIds],
     frontNodeIds: accessories.frontNodeIds,
-    headPath: headPath(pose, surface),
+    headPath: virus?.membrane ?? headPath(pose, surface),
     leftPath: path(left),
     rightPath: path(right),
     leftVisible: leftSamples.reduce((total, sample) => total + sample.normal[2], 0) > 0,

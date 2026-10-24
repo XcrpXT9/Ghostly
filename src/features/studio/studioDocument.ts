@@ -17,6 +17,7 @@ export type StatePlaybackSelection = { stateId: string | null; playing: boolean 
 
 export type StudioDocument = {
   version: 2
+  bundledAvatarVersion?: number
   library: AvatarLibrary
   expressions: Expression[]
   sequences: AvatarSequence[]
@@ -57,6 +58,7 @@ export const parseStudioDocument = (value: unknown, fallback: StudioDocument): S
   const library = parseAvatarLibrary(candidate.library, fallback.library, baseBehavior)
   return {
     version: 2,
+    ...(candidate.bundledAvatarVersion === 1 ? { bundledAvatarVersion: 1 } : {}),
     library,
     expressions: baseBehavior.expressions,
     sequences: baseBehavior.sequences,
@@ -104,10 +106,18 @@ export const loadStudioDocument = (
 ): StudioDocument => {
   const fallback = createBundledStudioDocument()
   try {
-    return parseStudioDocument(
+    const document = parseStudioDocument(
       JSON.parse(storage.getItem(DOCUMENT_STORAGE_KEY) ?? 'null'),
       fallback
     )
+    if (document.bundledAvatarVersion !== 1) {
+      const vivi = fallback.library.avatars.find(avatar => avatar.id === 'vivi')
+      if (vivi && !document.library.avatars.some(avatar => avatar.id === vivi.id)) {
+        document.library.avatars.push(structuredClone(vivi))
+      }
+      document.bundledAvatarVersion = 1
+    }
+    return document
   } catch {
     return fallback
   }

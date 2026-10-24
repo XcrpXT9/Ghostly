@@ -1,4 +1,18 @@
 export const chinese: Record<string, string> = {
+  Virus: '病毒',
+  'Compagnon du site': '网站伙伴',
+  'Afficher le compagnon': '显示伙伴',
+  'Deux cercles pour étourdir, un double-clic pour sauter. Éloignez le curseur pour détacher.':
+    '画两圈让伙伴眩晕，双击让它跳跃。移开光标即可脱离停靠。',
+  Suivre: '跟随',
+  Sauter: '跳跃',
+  Étourdir: '眩晕',
+  Étourdi: '眩晕中',
+  'En saut': '跳跃中',
+  Accroché: '已停靠',
+  'Suit le curseur': '跟随光标',
+  Masqué: '已隐藏',
+  Playground: '互动测试',
   'Playground de l’avatar': '头像游乐场',
   Arrêté: '已停止',
   'Aperçu procédural en direct': '实时程序化预览',

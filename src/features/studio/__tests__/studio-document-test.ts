@@ -16,6 +16,7 @@ const documentFixture = (): StudioDocument => {
   const avatar = createAvatar('Strobi')
   return {
     version: 2,
+    bundledAvatarVersion: 1,
     library: {
       activeAvatarId: avatar.id,
       avatars: [avatar],
@@ -32,7 +33,7 @@ describe('Studio document', () => {
   it('loads the bundled Studio snapshot when no local project exists', () => {
     const document = loadStudioDocument(storage())
 
-    expect(document.library.avatars).toHaveLength(10)
+    expect(document.library.avatars).toHaveLength(11)
     expect(document.library.activeAvatarId).toBe(document.library.avatars[0].id)
     expect(document.library.avatars[0].name).toBe('Strobi')
     expect(document.expressions).toHaveLength(27)

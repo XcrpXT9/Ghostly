@@ -77,6 +77,7 @@ Call the API in the browser after `document.body` exists; in React, mount and de
 
 System reduced-motion preferences are observed live: expressions still change, following snaps
 to its destination, and membrane movement, jump displacement, wobble, and trails are disabled.
-Vivi is a runtime SVG character and is not serialized into the Studio's body-surface schema.
+Vivi uses the native `virus` surface in the shared core renderer. It can be edited and exported from
+the Studio as `.avatar.json`, then passed to `createAvatar` or `createCompanion` like any other avatar.
 `createVirus(target)` is also exported for standalone rendering; it returns `render(frame)` and
 `destroy()`. The caller supplies time and owns its animation frame.

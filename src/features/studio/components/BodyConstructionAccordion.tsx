@@ -120,7 +120,7 @@ export function BodyConstructionAccordion({
           </AccordionTrigger>
           <AccordionContent className="body-node-accordion-content">
             <div className="surface-grid body-surface-grid">
-              {bodyPrimitiveTypes.map(type => {
+              {([...bodyPrimitiveTypes, 'virus'] as const).map(type => {
                 const previewSurface = type === surface.type ? surface : surfacePresets[type]
                 return (
                   <Button

@@ -85,11 +85,21 @@ pnpm dev
 
 Open [http://localhost:5173](http://localhost:5173).
 
-### Website companion playground
+### Native virus and website companion
 
-Open [http://localhost:5173/playground.html](http://localhost:5173/playground.html) after starting
-the dev server. The separate HTML playground is also included in the production build as
-`dist/playground.html`. Serve it over HTTP using `pnpm preview` or your static host.
+Open the Studio and select **Vivi** in the existing avatar library. Its native `virus` surface supports
+body dimensions, colors, eyes, expressions, animations, duplication, Photo Mode, project JSON, and
+portable `.avatar.json` exports. Existing saved projects receive Vivi once without replacing their
+avatars or selection; deleting Vivi is respected on subsequent loads.
+
+The **Website companion** controls in the Studio follow the selected avatar, including edits. The
+companion can dock on Studio cards, jump, get dizzy, or be hidden while editing. Open **Playground**
+from those controls to test that same avatar. The playground reads the saved Studio library, including
+custom and duplicated avatars, and refreshes saved edits when you return from the Studio tab.
+
+[http://localhost:5173/playground.html](http://localhost:5173/playground.html) remains an HTML testing
+surface for the same app and shared renderer. Production builds include `dist/playground.html`;
+serve it over HTTP using `pnpm preview` or your static host.
 
 - Move the mouse to lead the mascot with a smooth trailing motion.
 - Click a button inside a bento card to dock at its closest top corner. Move more than 36 pixels
@@ -103,9 +113,9 @@ the dev server. The separate HTML playground is also included in the production 
   and docking while suppressing continuous membrane motion, wobble, jump displacement, and trails.
 
 The companion API is exported from `@bible-strong/avatar-web`; see its
-[integration guide](./packages/avatar-web/README.md#website-companions). Vivi is a procedural web
-renderer, not an editable Studio surface or `.avatar.json` export. The existing Studio document
-schema and saved avatars are unchanged. These additions are documented in the
+[integration guide](./packages/avatar-web/README.md#website-companions). The Studio, React renderer, web renderer,
+companion and playground all use the same native virus geometry. Existing avatar definitions remain
+valid; virus definitions require the updated runtime packages. These additions are documented in the
 [companion specification](./docs/specs/2026-10-23-website-companion.md).
 
 ## Available commands

@@ -344,5 +344,11 @@ export const renderAvatarFrame = (
   const expression = environment.reduceMotion
     ? frame.expression
     : applyAmbientMotion(frame.expression, frame.sampledAt)
-  return renderAvatarExpression(definition, expression, frame.colors, frame.blink)
+  return renderAvatarExpression(
+    definition,
+    expression,
+    frame.colors,
+    frame.blink,
+    environment.reduceMotion ? 0 : frame.sampledAt
+  )
 }

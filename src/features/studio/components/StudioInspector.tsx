@@ -85,6 +85,7 @@ import {
 } from '@/features/studio/components/RuntimeGuideDialog'
 import { RuntimePreviewDialog } from '@/features/studio/components/RuntimePreviewDialog'
 import { StudioIdentity } from '@/features/studio/components/StudioIdentity'
+import { StudioCompanion } from '@/features/studio/components/StudioCompanion'
 import type { StudioController } from '@/features/studio/useStudioController'
 
 const reactQuickStartInstall = 'npm install @bible-strong/avatar-react react react-dom'
@@ -655,6 +656,7 @@ export function StudioInspector({ controller }: { controller: StudioController }
           setLanguage={setLanguage}
           t={t}
         />
+        <StudioCompanion avatar={activeAvatar} expressions={expressions} sequences={sequences} />
         {sequenceEditing && !editing && (
           <motion.div
             key={`sequence-${sequenceEditing.sourceId ?? 'new'}`}
